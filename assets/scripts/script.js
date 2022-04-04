@@ -1,5 +1,6 @@
 const cardBoard = document.querySelector("#gameBoard");
 
+
 const images = [
   "bootstrap.png",
   "electron.png",
@@ -13,84 +14,97 @@ const images = [
   "react.png",
 ];
 
-
-let cardHTML = []; 
-var i = 0;
+let cardHTML = [];
+var i = 0; // Ao chegar em 10 finaliza o game
 var clicks = 0;
 
-images.forEach((img, i) => { // FOR EACH PARA COLOCAR AS IMAGENS NA TELA;
-  cardHTML += `
-    <div class="card">
-    <img class="front-face" src="assets/images/${img}">
-    <img class="back-face" data-card="${images[i].substring(0,images[i].length - 4)}" src="assets/images/eva-azul-brasil.jpg">
-    </div>`;
-});
+function startGame() {
+  images.forEach((img, i) => {
+    // FOR EACH PARA COLOCAR AS IMAGENS NA TELA;
+    cardHTML += `
+          <div class="card">
+          <img class="front-face" src="assets/images/${img}">
+          <img class="back-face" data-card="${images[i].substring(
+            0,
+            images[i].length - 4
+          )}" src="assets/images/eva-azul-brasil.jpg">
+          </div>`;
+  });
 
-cardBoard.innerHTML = cardHTML + cardHTML ; // Duplicar as imagens
+  cardBoard.innerHTML = cardHTML + cardHTML; // ADD + 1 vez os elementos
+  shuffleImg(); // Embaralha os mesmos
+}
 
-const imgBox = document.querySelectorAll(".back-face");
-const card = document.querySelectorAll(".card");
-function shuffleImg(){
-    card.forEach((card) => {
-        let random = Math.floor(Math.random() * 12);
-        card.style.order = random;
-    })
-  };
-shuffleImg();
+function shuffleImg() {
+  const imgBox = document.querySelectorAll(".back-face");
+  const card = document.querySelectorAll(".card");
+  imgBox.forEach((card) => card.addEventListener("click", flip));
 
-let firstCard, secondCard;
-var locked = false;
+  card.forEach((card) => {
+    // GERA UM NUMERO ALEATORIO PARA O CARD;
+    let random = Math.floor(Math.random() * 12);
+    card.style.order = random;
+  });
+}
+
+let firstCard, secondCard; // DECLARA 1 e 2 variavéis a para o THIS
+var locked = false; // DIZ SE AS CARTAS ESTÃO TRAVADAS
+
+function clicked(){
+    var span = document.querySelector("#counter");
+    span.innerHTML = `Você já fez ${++clicks} tentativas`
+    console.log(clicks);
+}
 
 function flip() {
-  if (locked) return false;
-  this.classList.add("flip");
+  if (locked) return false; // Trava ao ter 2 elementos selecionados
+  this.classList.add("flip"); // Adiciona a class Flip para executar a animaçõa
 
   if (!firstCard) {
     firstCard = this;
-
     return false;
   }
   secondCard = this;
-  verifyPair();
-  if (firstCard && secondCard) {
-  }
+  verifyPair(); // Verifica se os pares são True
+  clicked();
 }
-
-imgBox.forEach((card) => card.addEventListener("click", flip));
 
 function verifyPair() {
   let equal = firstCard.dataset.card === secondCard.dataset.card;
+  console.log(equal);
   if (equal === false) {
-    disableCard();
+    disableCard(); // se não for FALSE, reseta.
   } else {
-    reset(equal); console.log(equal);
-    i++
-    if(i === 10){
-       
-        setTimeout(()=>{
-            if(confirm('Você ganhou,Seu jogo será reiniciado')){
-                window.location.reload();
-            }
-        },2000)
+    reset(equal); // QUANDO ACERTA ELE RESETA E REMOVE A OPÇÃO DE CLICAR NO ELEMENTO
+    console.log("ACERTOU");
+    i++;
+    if (i === 10) {
+      setTimeout(() => {
+        if (confirm("Você ganhou,Seu jogo será reiniciado")) {
+          window.location.reload();
+        }
+      }, 2000);
     }
   }
- 
 }
+
 function disableCard() {
-  locked = true;
+  //RESETA AS VARIÁVÉIS APOS O ACERTO E TRAVA;
+  locked = true; // quando TRUE são diferente
   setTimeout(() => {
     firstCard.classList.remove("flip");
     secondCard.classList.remove("flip");
 
-    locked = false;
+    locked = false; // quando FALSE, trava a carta
     reset();
   }, 800);
 }
 
 function reset(equal = false) {
-    if(equal){
-        firstCard.removeEventListener("click",flip)
-    }
-    [firstCard,secondCard, locked] = [null, null, false]
+  // RESET AS VARIÁVÉIS
+  if (equal) {
+    // Impede que seja clicado novamente
+    firstCard.removeEventListener("click", flip);
+  }
+  [firstCard, secondCard, locked] = [null, null, false];
 }
-
