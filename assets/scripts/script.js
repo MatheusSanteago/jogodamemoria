@@ -80,10 +80,10 @@ function verifyPair() {
     i++;
     if (i === 10) {
       setTimeout(() => {
-        if (confirm("Você ganhou,Seu jogo será reiniciado")) {
-          window.location.reload();
+        if (confirm("Você ganhou com " + clicks + " tentativas,Seu jogo será reiniciado")) {
+          window.location.reload(startGame());
         }
-      }, 2000);
+      }, 1000);
     }
   }
 }
